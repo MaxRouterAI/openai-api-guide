@@ -1,155 +1,205 @@
-# OpenAI API 国内使用完整指南【2026 年最新】
+# OpenAI Codex CLI 国内使用完整教程（2026 最新）
 
-> 国内开发者使用 OpenAI API（GPT-5、GPT-4o、o3 等）的完整解决方案 — 无需魔法，统一接口，按量计费
+> Codex CLI 是 OpenAI 官方推出的终端 AI 编程工具，跟 Claude Code 类似但基于 GPT 系列模型。本文记录了国内开发者从安装到配置的完整过程。
 
-## 📌 你遇到的问题
+---
 
-- ❌ OpenAI 官网国内无法访问，注册需要海外手机号
-- ❌ API 直连超时、被封 IP
-- ❌ 需要绑定海外信用卡才能使用
-- ❌ 不知道如何稳定、低成本地调用 GPT 系列模型
+## 什么是 Codex CLI
 
-## 🚀 解决方案：通过 MaxRouter 中转
+Codex CLI 是 OpenAI 在 2025 年推出的开源终端编程工具，用 Rust 编写，MIT 协议开源。它可以：
 
-[MaxRouter](https://www.maxrouter.ai) 提供 OpenAI API 中转服务，完全兼容 OpenAI SDK，国内直连。
+- 阅读你的代码库，理解项目结构
+- 用自然语言描述需求，自动编写和修改代码
+- 执行终端命令（编译、测试、部署）
+- 通过 OS 级沙箱保证安全性
+- 支持 GPT-5、o3 等 OpenAI 最新推理模型
 
-**核心优势：**
-- ✅ 国内直连，无需代理
-- ✅ 100% 兼容 OpenAI SDK，改一行 `base_url` 即可
-- ✅ 按量计费，无月费，注册即送 ¥10 体验金
-- ✅ 支持 GPT-5、GPT-4o、o3、o1 等全系列模型
-- ✅ 同时支持 Claude、Gemini、DeepSeek 等 80+ 模型
+跟 Claude Code 的定位类似，都是终端里的 AI 编程 Agent，区别在于底层模型不同。
 
-## 🤖 支持的 OpenAI 模型
+## 安装 Codex CLI
+
+### 系统要求
+
+- macOS、Linux、或 Windows（WSL）
+- Node.js 22+（推荐）
+
+### 安装命令
+
+```bash
+npm install -g @openai/codex
+```
+
+安装完成后验证：
+
+```bash
+codex --version
+```
+
+> ⚠️ 国内 npm 可能比较慢，先换镜像：`npm config set registry https://registry.npmmirror.com`
+
+## 官方使用方式
+
+Codex CLI 需要 OpenAI API Key。官方的方式是：
+
+1. 注册 OpenAI 账号（[platform.openai.com](https://platform.openai.com)）
+2. 绑定信用卡，充值余额
+3. 创建 API Key
+4. 设置环境变量 `OPENAI_API_KEY`
+
+```bash
+export OPENAI_API_KEY=sk-your-openai-key
+codex
+```
+
+## 国内的问题
+
+跟 Claude Code 一样，国内开发者直接用官方服务会遇到障碍：
+
+**网络问题：**
+- `api.openai.com` 在国内无法直接访问
+- 代理工具不稳定，编程过程中断连很影响体验
+
+**账号问题：**
+- OpenAI 注册需要海外手机号
+- 需要绑定海外信用卡
+- 部分地区 IP 被封，虚拟卡有封号风险
+
+**成本问题：**
+- GPT-5、o3 等模型价格不低
+- 按量付费需要先解决支付问题
+
+## 我的方案：API 中转
+
+Codex CLI 支持通过 `OPENAI_BASE_URL` 环境变量自定义 API 地址。配合中转服务，国内直连就能用。
+
+我用的是 [MaxRouter](https://www.maxrouter.ai)，支持所有 OpenAI 模型，与官方同价，按量计费。同一个 Key 还能调用 Claude、Gemini、DeepSeek 等 80+ 模型。
+
+## 配置步骤
+
+### 1. 注册 MaxRouter
+
+访问 [www.maxrouter.ai](https://www.maxrouter.ai) 注册，送 ¥10 体验金。
+
+进入控制台 → 密钥管理 → 创建密钥 → 复制 Key。
+
+### 2. 设置环境变量
+
+**macOS / Linux（Zsh）：**
+
+```bash
+nano ~/.zshrc
+
+# 添加这两行
+export OPENAI_API_KEY=sk-your-maxrouter-key
+export OPENAI_BASE_URL=https://api.maxrouter.ai/v1
+
+source ~/.zshrc
+```
+
+**macOS / Linux（Bash）：**
+
+```bash
+nano ~/.bashrc
+
+export OPENAI_API_KEY=sk-your-maxrouter-key
+export OPENAI_BASE_URL=https://api.maxrouter.ai/v1
+
+source ~/.bashrc
+```
+
+**Windows PowerShell：**
+
+```powershell
+$env:OPENAI_API_KEY = "sk-your-maxrouter-key"
+$env:OPENAI_BASE_URL = "https://api.maxrouter.ai/v1"
+```
+
+### 3. 启动 Codex CLI
+
+```bash
+codex
+```
+
+配置正确就能正常使用了。
+
+## 支持的模型
 
 | 模型 | 说明 |
 |------|------|
-| `gpt-5` | OpenAI 最新旗舰模型 |
-| `gpt-4o` | 多模态模型，支持文本/图像/音频 |
-| `gpt-4o-mini` | 轻量版，性价比高 |
+| `gpt-5` | OpenAI 最新旗舰 |
 | `o3` | 推理增强模型 |
-| `o3-mini` | 轻量推理模型 |
+| `o3-mini` | 轻量推理 |
+| `gpt-4o` | 多模态，支持图像 |
+| `gpt-4o-mini` | 性价比高 |
 | `o1` | 初代推理模型 |
 
-## 📋 快速开始
+## Codex CLI 常用操作
 
-### 第一步：注册账号
+```
+> 帮我把这个项目从 CommonJS 迁移到 ESM
 
-访问 [www.maxrouter.ai](https://www.maxrouter.ai)，注册即送 ¥10 体验金。
+> 这个 API 接口响应太慢，帮我分析瓶颈并优化
 
-### 第二步：获取 API Key
+> 写一个完整的用户认证模块，包含注册、登录、JWT 刷新
 
-登录 [控制台 → 令牌管理](https://www.maxrouter.ai/console/tokens)，创建 API Key。
-
-### 第三步：替换 base_url 开始使用
-
-**Python：**
-
-```python
-from openai import OpenAI
-
-client = OpenAI(
-    api_key="sk-your-key",
-    base_url="https://api.maxrouter.ai/v1"  # 只需改这一行
-)
-
-response = client.chat.completions.create(
-    model="gpt-4o",
-    messages=[{"role": "user", "content": "你好，请介绍一下你自己"}]
-)
-print(response.choices[0].message.content)
+> 审查 src/ 下的代码，找出安全隐患
 ```
 
-**Node.js：**
+### 安全模式
 
-```javascript
-import OpenAI from 'openai';
+Codex CLI 有三种安全模式：
 
-const client = new OpenAI({
-    apiKey: 'sk-your-key',
-    baseURL: 'https://api.maxrouter.ai/v1'  // 只需改这一行
-});
-
-const response = await client.chat.completions.create({
-    model: 'gpt-4o',
-    messages: [{ role: 'user', content: '你好' }]
-});
-console.log(response.choices[0].message.content);
-```
-
-**cURL：**
+- `suggest` — 只建议，不自动执行（最安全）
+- `auto-edit` — 自动编辑文件，但执行命令需确认
+- `full-auto` — 完全自动（在沙箱中运行）
 
 ```bash
-curl https://api.maxrouter.ai/v1/chat/completions \
-  -H "Authorization: Bearer sk-your-key" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "gpt-4o",
-    "messages": [{"role": "user", "content": "你好"}]
-  }'
+codex --approval-mode full-auto "帮我重构这个模块"
 ```
 
-## 🔧 开发工具配置
+### AGENTS.md
 
-### Cursor
+跟 Claude Code 的 `CLAUDE.md` 类似，Codex CLI 会读取项目根目录的 `AGENTS.md` 文件作为项目说明。
 
+## 配合其他工具
+
+同一个 MaxRouter Key 还能用在：
+
+**Cursor：**
 - Override OpenAI Base URL: `https://api.maxrouter.ai/v1`
-- API Key: `sk-your-key`
 
-### ChatBox
-
+**ChatBox / NextChat：**
 - API Host: `https://api.maxrouter.ai`
-- API Key: `sk-your-key`
-- 模型: `gpt-4o`
 
-### NextChat（ChatGPT Next Web）
-
-- 接口地址: `https://api.maxrouter.ai`
-- API Key: `sk-your-key`
-
-## 📡 流式输出（Streaming）
+**Python / Node.js 项目：**
 
 ```python
 from openai import OpenAI
-
 client = OpenAI(
     api_key="sk-your-key",
     base_url="https://api.maxrouter.ai/v1"
 )
-
-stream = client.chat.completions.create(
-    model="gpt-4o",
-    messages=[{"role": "user", "content": "写一首关于编程的诗"}],
-    stream=True
-)
-
-for chunk in stream:
-    content = chunk.choices[0].delta.content
-    if content:
-        print(content, end="", flush=True)
 ```
 
-## ❓ 常见问题
+## 常见问题
 
-### Q: 跟 OpenAI 官方有什么区别？
-A: 功能完全一致，MaxRouter 只做请求转发。你的代码只需改 `base_url`，其余完全不变。
+**Q: 跟 Claude Code 比怎么样？**
+各有优势。Claude Code 在代码理解和重构上更强，Codex CLI 的沙箱安全机制更完善。建议都试试，看哪个更适合你的场景。
 
-### Q: 支持 Function Calling / Tools 吗？
-A: 支持。所有 OpenAI API 功能（Function Calling、JSON Mode、Vision、Streaming 等）都完整支持。
+**Q: 支持流式输出吗？**
+支持。
 
-### Q: 支持图片输入吗？
-A: 支持。GPT-4o 的多模态能力完整可用，可以发送图片进行分析。
+**Q: 除了 GPT，能用 Claude 模型吗？**
+MaxRouter 支持所有主流模型。但 Codex CLI 本身是为 OpenAI 模型设计的，用 Claude 模型建议用 Claude Code。
 
-### Q: 除了 OpenAI，还支持什么模型？
-A: 同时支持 Claude（Anthropic）、Gemini（Google）、DeepSeek、通义千问、GLM 等 80+ 模型，全部通过统一的 OpenAI 兼容接口调用。
+## 相关链接
 
-## 🔗 相关链接
-
-- 🌐 官网：[www.maxrouter.ai](https://www.maxrouter.ai)
-- 📖 完整文档：[www.maxrouter.ai/docs](https://www.maxrouter.ai/docs)
-- 🤖 模型列表：[www.maxrouter.ai/models](https://www.maxrouter.ai/models)
-- 💰 价格查询：[www.maxrouter.ai/pricing](https://www.maxrouter.ai/pricing)
+- [Codex CLI GitHub](https://github.com/openai/codex)
+- [OpenAI 官方文档](https://platform.openai.com/docs)
+- [MaxRouter](https://www.maxrouter.ai) — 我用的 API 平台
+- [MaxRouter 文档](https://www.maxrouter.ai/docs)
+- [Claude Code 国内教程](https://github.com/MaxRouterAI/claude-code-guide)
 
 ---
 
-**⭐ 觉得有用？给个 Star 支持一下！**
+觉得有用就给个 ⭐ Star，有问题欢迎提 Issue。
